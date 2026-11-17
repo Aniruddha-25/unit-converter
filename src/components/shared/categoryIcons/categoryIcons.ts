@@ -1,5 +1,5 @@
 import {
-  ArrowLeftRight, AudioWaveform, BatteryCharging, Box, Calendar, CalendarRange, Clock, Cog, Coins, Cpu, CircleDollarSign,
+  ArrowLeftRight, AudioWaveform, BatteryCharging, Box, Calendar, CalendarRange, Clock, Cog, CircleStar, Cpu, CircleDollarSign,
   DraftingCompass, Droplets, Expand, Footprints, Fuel, Gauge, Globe, HandFist, Hourglass, House, Layers,
   Plug, Ruler, Save, Scale, Shapes, Shrink, Thermometer, Utensils, Wallet, Weight, Zap,
   type LucideIcon,
@@ -27,7 +27,7 @@ export const categoryIcons: Readonly<Record<string, LucideIcon>> = {
   'data-storage': Save,
   'data-rate': ArrowLeftRight,
   currency: CircleDollarSign,
-  gold: Coins,
+  gold: CircleStar,
   'fuel-economy': Droplets,
   'fuel-cost': Fuel,
   cooking: Utensils,
