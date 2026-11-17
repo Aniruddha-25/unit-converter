@@ -2,7 +2,7 @@
 
 A React + TypeScript web app for unit conversion. Pick a category from the grid and it opens in a dialog.
 
-**Live:** <https://Aniruddha-25.github.io/unit-convertor/>
+**Live:** <https://Aniruddha-25.github.io/unit-converter/>
 
 ## Converters
 
