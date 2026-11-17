@@ -1,9 +1,9 @@
-import type { IconDefinition } from '@fortawesome/fontawesome-svg-core'
+import type { LucideIcon } from 'lucide-react'
 import AppIcon from '../AppIcon/AppIcon.tsx'
 import './Segmented.css'
 
 interface Option<T extends string> {
-  icon?: IconDefinition
+  icon?: LucideIcon
   value: T
   label: string
 }

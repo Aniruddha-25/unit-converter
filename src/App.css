@@ -57,9 +57,13 @@
   .modal-backdrop { padding: 8px; align-items: flex-end; }
   .modal { padding: 24px 16px 16px; max-height: calc(100dvh - 16px); }
 }
+/* Shared button (also used by the error boundary, which can render before any converter CSS has loaded) */
+.uc-clear { font: inherit; padding: 8px 16px; border-radius: 8px; border: 1px solid var(--border); background: var(--surface); color: var(--text); cursor: pointer; }
+.uc-clear:hover { background: var(--accent-soft); }
+.modal-loading { margin: 0; padding: 40px 0; text-align: center; color: var(--muted); }
 .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 
-/* Font Awesome icons: one size, inherits text color, sits on the text baseline */
-.app-icon { margin-right: .5em; font-size: .9em; color: var(--muted); }
+/* Lucide icons: one size, inherits text color, sits on the text baseline */
+.app-icon { flex: none; width: 1.25em; height: 1em; margin-right: .5em; font-size: .9em; color: var(--muted); vertical-align: -.125em; }
 .cat-name .app-icon { color: var(--accent); }
 .seg-btn .app-icon { margin-right: .4em; color: inherit; }

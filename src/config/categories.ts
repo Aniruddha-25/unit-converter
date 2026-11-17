@@ -1,8 +1,5 @@
+import { lazy } from 'react'
 import type { CategoryConfig, CategoryGroup } from '../types/converter.ts'
-import { fuelEconomyConverter } from '../converters/motion-mechanics/fuel-economy/fuelEconomy.ts'
-import { dataRateConverter } from '../converters/digital-computing/data-rate/dataRate.ts'
-import { dataStorageConverter } from '../converters/digital-computing/data-storage/dataStorage.ts'
-import { timeConverter } from '../converters/date-time/time/timeConverter.ts'
 
 export const categoryGroups: readonly CategoryGroup[] = [
   { id: 'basic', name: 'Basic Measurements' },
@@ -15,7 +12,7 @@ export const categoryGroups: readonly CategoryGroup[] = [
   { id: 'lifestyle', name: 'Everyday & Lifestyle' },
 ]
 
-type Soon = Omit<CategoryConfig, 'status' | 'converter' | 'description'> & { description?: string }
+type Soon = Omit<CategoryConfig, 'status' | 'component' | 'description'> & { description?: string }
 
 const soon = (c: Soon): CategoryConfig => ({
   ...c,
@@ -24,7 +21,9 @@ const soon = (c: Soon): CategoryConfig => ({
 })
 
 /**
- * To make a category functional: set status 'available' and attach a `converter`.
+ * To make a category functional: set status 'available' and attach a lazy `component`.
+ * Each `import()` becomes its own chunk, fetched only when that category is first opened.
+ * Keep this file free of static imports from src/converters/ so nothing converter-specific lands in the main bundle.
  */
 export const categories: readonly CategoryConfig[] = [
   // Basic Measurements
@@ -44,9 +43,9 @@ export const categories: readonly CategoryConfig[] = [
     id: 'fuel-economy',
     name: 'Fuel Economy Converter',
     groupId: 'motion',
-    description: fuelEconomyConverter.description,
+    description: 'Convert between km/L, L/100 km, and US and UK miles per gallon.',
     status: 'available',
-    converter: fuelEconomyConverter,
+    component: lazy(() => import('../converters/motion-mechanics/fuel-economy/FuelEconomyConverter.tsx')),
   },
   // Energy & Electrical
   soon({ id: 'energy', name: 'Energy', groupId: 'energy' }),
@@ -57,9 +56,9 @@ export const categories: readonly CategoryConfig[] = [
     id: 'time',
     name: 'Time',
     groupId: 'datetime',
-    description: timeConverter.description,
+    description: 'Convert between units of time, from nanoseconds to years.',
     status: 'available',
-    converter: timeConverter,
+    component: lazy(() => import('../converters/date-time/time/TimeConverter.tsx')),
   },
   soon({ id: 'time-duration', name: 'Time Duration', groupId: 'datetime' }),
   {
@@ -68,6 +67,7 @@ export const categories: readonly CategoryConfig[] = [
     groupId: 'datetime',
     description: 'Convert a date and time between IANA time zones, with daylight saving handled.',
     status: 'available',
+    component: lazy(() => import('../converters/date-time/time-zone/TimeZoneConverter.tsx')),
   },
   soon({ id: 'date-difference', name: 'Date Difference', groupId: 'datetime', description: 'Date difference calculation is a future feature.' }),
   // Digital & Computing
@@ -75,17 +75,17 @@ export const categories: readonly CategoryConfig[] = [
     id: 'data-storage',
     name: 'Data Storage',
     groupId: 'digital',
-    description: dataStorageConverter.description,
+    description: 'Convert between bits and bytes, from b and B up to Yb and YB (base 1,024).',
     status: 'available',
-    converter: dataStorageConverter,
+    component: lazy(() => import('../converters/digital-computing/data-storage/DataStorageConverter.tsx')),
   },
   {
     id: 'data-rate',
     name: 'Data Transfer Rate',
     groupId: 'digital',
-    description: dataRateConverter.description,
+    description: 'Convert bit and byte transfer rates per second, minute or hour (base 1024).',
     status: 'available',
-    converter: dataRateConverter,
+    component: lazy(() => import('../converters/digital-computing/data-rate/DataRateConverter.tsx')),
   },
   // Finance
   {
@@ -94,6 +94,7 @@ export const categories: readonly CategoryConfig[] = [
     groupId: 'finance',
     description: 'Convert between world currencies using the latest exchange rates.',
     status: 'available',
+    component: lazy(() => import('../converters/finance/currency/CurrencyConverter.tsx')),
   },
   {
     id: 'gold',
@@ -101,6 +102,7 @@ export const categories: readonly CategoryConfig[] = [
     groupId: 'finance',
     description: 'Live gold rates, plus pure gold and alloy content by weight and purity.',
     status: 'available',
+    component: lazy(() => import('../converters/finance/gold/GoldConverter.tsx')),
   },
   // Everyday & Lifestyle
   {
@@ -109,6 +111,7 @@ export const categories: readonly CategoryConfig[] = [
     groupId: 'lifestyle',
     description: 'Estimate the fuel needed and the total cost of a journey, including round trips.',
     status: 'available',
+    component: lazy(() => import('../converters/everyday-lifestyle/fuel-cost/FuelCostCalculator.tsx')),
   },
   soon({ id: 'cooking', name: 'Cooking Measurements', groupId: 'lifestyle' }),
   soon({ id: 'shoe-size', name: 'Shoe Size', groupId: 'lifestyle', description: 'Shoe size conversion is a future feature.' }),

@@ -1,8 +1,8 @@
 import { useState } from 'react'
-import type { ConverterConfig } from '../../../types/converter.ts'
+import { Clock, Hourglass } from 'lucide-react'
+import { timeConverter as config } from './timeConverter.ts'
 import ClockTimeConverter from './ClockTimeConverter.tsx'
 import { categoryIcons } from '../../../components/shared/categoryIcons/categoryIcons.ts'
-import { faHourglassHalf, faClock } from '@fortawesome/free-solid-svg-icons'
 import AppIcon from '../../../components/shared/AppIcon/AppIcon.tsx'
 import Segmented from '../../../components/shared/Segmented/Segmented.tsx'
 import UnitConverter from '../../../components/shared/UnitConverter/UnitConverter.tsx'
@@ -12,7 +12,7 @@ import './TimeConverter.css'
 type Mode = 'duration' | 'clock'
 
 /** Time category view: duration conversion (units) and clock-time input (time of day) as separate modes. */
-export default function TimeConverter({ config }: { config: ConverterConfig }) {
+export default function TimeConverter() {
   const [mode, setMode] = useState<Mode>('duration')
 
   return (
@@ -30,8 +30,8 @@ export default function TimeConverter({ config }: { config: ConverterConfig }) {
           value={mode}
           onChange={setMode}
           options={[
-            { value: 'duration', label: 'Duration', icon: faHourglassHalf },
-            { value: 'clock', label: 'Clock time', icon: faClock },
+            { value: 'duration', label: 'Duration', icon: Hourglass },
+            { value: 'clock', label: 'Clock time', icon: Clock },
           ]}
         />
       </div>

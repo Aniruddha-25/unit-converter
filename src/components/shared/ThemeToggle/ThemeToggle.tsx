@@ -1,5 +1,5 @@
 import { useSyncExternalStore } from 'react'
-import { faMoon, faSun } from '@fortawesome/free-solid-svg-icons'
+import { Moon, Sun } from 'lucide-react'
 import AppIcon from '../AppIcon/AppIcon.tsx'
 import { getTheme, setTheme, subscribeTheme } from './theme.ts'
 import './ThemeToggle.css'
@@ -21,8 +21,8 @@ export default function ThemeToggle() {
       onClick={() => setTheme(dark ? 'light' : 'dark')}
     >
       <span className="theme-thumb" aria-hidden="true">
-        <AppIcon icon={faSun} />
-        <AppIcon icon={faMoon} />
+        <AppIcon icon={Sun} />
+        <AppIcon icon={Moon} />
       </span>
     </button>
   )

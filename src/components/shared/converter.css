@@ -26,8 +26,6 @@
 .uc-result-unit { font-size: 1.2rem; font-weight: 500; }
 .uc-result-name, .uc-result-empty { color: var(--muted); }
 .uc-actions { margin-top: 12px; display: flex; flex-wrap: wrap; gap: 8px; }
-.uc-clear { font: inherit; padding: 8px 16px; border-radius: 8px; border: 1px solid var(--border); background: var(--surface); color: var(--text); cursor: pointer; }
-.uc-clear:hover { background: var(--accent-soft); }
 @media (max-width: 520px) {
   .uc-units { flex-direction: column; align-items: stretch; gap: 0; }
   .uc-swap { align-self: center; margin: -4px 0 12px; transform: rotate(90deg); }

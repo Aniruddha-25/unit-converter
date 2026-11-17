@@ -1,4 +1,6 @@
-/** A single unit. `factor` = how many base units one of this unit equals. */
+import type { ComponentType, LazyExoticComponent } from 'react'
+
+/** A single unit.`factor` = how many base units one of this unit equals. */
 export interface UnitDefinition {
   id: string
   name: string
@@ -36,8 +38,11 @@ export interface CategoryConfig {
   groupId: string
   description: string
   status: CategoryStatus
-  /** Generic unit-converter config. Available categories provide this OR a standalone view (see ConverterView). */
-  converter?: ConverterConfig
+  /**
+   * Lazy-loaded converter view (React.lazy around a dynamic import). Only 'available' categories provide one;
+   * it is fetched and mounted when the category is opened and unmounted when the modal closes.
+   */
+  component?: LazyExoticComponent<ComponentType>
 }
 
 export interface CategoryGroup {

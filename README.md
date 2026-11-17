@@ -82,7 +82,7 @@ flowchart LR
 - Vite
 - `country-data-list` (ISO 4217 currency metadata) and `flag-icons` (country flags)
 - ExchangeRate-API open endpoint for live currency rates and Gold-API for live spot gold (no API keys needed)
-- Font Awesome (`@fortawesome/*`) icons
+- `lucide-react` icons
 - ESLint
 
 ## Getting Started

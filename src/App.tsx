@@ -1,16 +1,16 @@
-import { useState } from 'react'
+import { Suspense, useState } from 'react'
 import CategoryGrid from './components/layout/CategoryGrid.tsx'
 import ComingSoon from './components/layout/ComingSoon.tsx'
 import ErrorBoundary from './components/layout/ErrorBoundary.tsx'
 import Modal from './components/layout/Modal.tsx'
 import ThemeToggle from './components/shared/ThemeToggle/ThemeToggle.tsx'
-import ConverterView from './components/shared/ConverterView/ConverterView.tsx'
 import { categories, categoryGroups } from './config/categories.ts'
 import './App.css'
 
 export default function App() {
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const selected = categories.find((c) => c.id === selectedId) ?? null
+  const Converter = selected?.status === 'available' ? selected.component : undefined
 
   return (
     <div className="app">
@@ -26,9 +26,11 @@ export default function App() {
       </main>
       {selected && (
         <Modal label={`${selected.name} converter`} onClose={() => setSelectedId(null)}>
-          {selected.status === 'available' ? (
+          {Converter ? (
             <ErrorBoundary key={selected.id}>
-              <ConverterView category={selected} />
+              <Suspense fallback={<p className="modal-loading" role="status">Loading…</p>}>
+                <Converter />
+              </Suspense>
             </ErrorBoundary>
           ) : (
             <ComingSoon category={selected} />
