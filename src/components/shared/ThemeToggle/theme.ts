@@ -1,27 +1,25 @@
 export type Theme = 'light' | 'dark'
 
-/** Must match the key read by the inline script in index.html, which applies the theme before first paint. */
-const STORAGE_KEY = 'theme'
 const ANIMATION_MS = 300
+const LIGHT_START_HOUR = 6 
+const DARK_START_HOUR = 18 
 
-const media = window.matchMedia('(prefers-color-scheme: dark)')
 const root = document.documentElement
 const listeners = new Set<() => void>()
 
 const isTheme = (value: unknown): value is Theme => value === 'light' || value === 'dark'
-const systemTheme = (): Theme => (media.matches ? 'dark' : 'light')
 
-function storedTheme(): Theme | null {
-  try {
-    const value = localStorage.getItem(STORAGE_KEY)
-    return isTheme(value) ? value : null
-  } catch {
-    return null
-  }
+/** The theme for the user's local clock. Keep in sync with the inline script in index.html. */
+const timeTheme = (date = new Date()): Theme => {
+  const hour = date.getHours()
+  return hour >= LIGHT_START_HOUR && hour < DARK_START_HOUR ? 'light' : 'dark'
 }
 
-let current: Theme = isTheme(root.dataset.theme) ? root.dataset.theme : (storedTheme() ?? systemTheme())
+let current: Theme = isTheme(root.dataset.theme) ? root.dataset.theme : timeTheme()
+/** Set once the user picks a theme; from then on the clock no longer changes it. Not persisted, so a reload resets it. */
+let manual = false
 let animationTimer: ReturnType<typeof setTimeout> | undefined
+let boundaryTimer: ReturnType<typeof setTimeout> | undefined
 
 /** Sets data-theme on <html>; every colour in the app comes from the CSS variables that attribute selects. */
 function apply(next: Theme, animate: boolean) {
@@ -36,16 +34,31 @@ function apply(next: Theme, animate: boolean) {
   listeners.forEach((notify) => notify())
 }
 
-apply(current, false)
+/** One timer, set for the next 06:00 / 18:00 (local time) instead of polling. */
+function scheduleBoundary() {
+  clearTimeout(boundaryTimer)
+  if (manual) return
+  const now = new Date()
+  const next = new Date(now)
+  const hour = now.getHours()
+  next.setHours(hour < LIGHT_START_HOUR ? LIGHT_START_HOUR : hour < DARK_START_HOUR ? DARK_START_HOUR : LIGHT_START_HOUR + 24, 0, 0, 0)
+  boundaryTimer = setTimeout(syncWithClock, next.getTime() - now.getTime())
+}
 
-/** The user's choice: applied now and remembered for next time. */
+function syncWithClock() {
+  if (manual) return
+  apply(timeTheme(), true)
+  scheduleBoundary()
+}
+
+apply(current, false)
+scheduleBoundary()
+
+/** The user's choice: applied now and kept for this visit only. */
 export function setTheme(next: Theme): void {
+  manual = true
+  clearTimeout(boundaryTimer)
   apply(next, true)
-  try {
-    localStorage.setItem(STORAGE_KEY, next)
-  } catch {
-    /* storage unavailable: the choice still applies for this visit */
-  }
 }
 
 export const getTheme = (): Theme => current
@@ -57,11 +70,7 @@ export function subscribeTheme(notify: () => void): () => void {
   }
 }
 
-// Until the user chooses, follow the operating system's setting (including while the page is open).
-media.addEventListener('change', () => {
-  if (!storedTheme()) apply(systemTheme(), true)
-})
-// Another tab changed the theme.
-window.addEventListener('storage', (e) => {
-  if (e.key === STORAGE_KEY) apply(storedTheme() ?? systemTheme(), true)
+// Timers can be delayed while the tab is hidden or the device sleeps; re-check the clock when the tab comes back.
+document.addEventListener('visibilitychange', () => {
+  if (!document.hidden) syncWithClock()
 })

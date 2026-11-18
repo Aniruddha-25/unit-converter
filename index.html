@@ -6,15 +6,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>unit-converter</title>
     <script>
-      // Apply the saved theme (or the OS preference on a first visit) before the page paints, so there is no flash.
-      // Keep the storage key in sync with src/components/shared/ThemeToggle/theme.ts.
+      // Apply the theme for the user's local time (light 06:00-17:59, dark otherwise) before the page paints, so there is no flash.
+      // Keep the hours in sync with src/components/shared/ThemeToggle/theme.ts.
       (function () {
-        var theme = 'light'
-        try {
-          var saved = localStorage.getItem('theme')
-          theme = saved === 'light' || saved === 'dark' ? saved : matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
-        } catch (e) {}
-        document.documentElement.dataset.theme = theme
+        var hour = new Date().getHours()
+        document.documentElement.dataset.theme = hour >= 6 && hour < 18 ? 'light' : 'dark'
       })()
     </script>
   </head>
