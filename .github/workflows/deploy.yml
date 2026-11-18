@@ -1,9 +1,9 @@
 name: Deploy to GitHub Pages
 
 on:
-  push:
-    branches:
-      - main
+  schedule:
+    # 12:00 AM IST (UTC+5:30) = 18:30 UTC the previous day. Scheduled runs can start late, but always use the latest commit on the default branch.
+    - cron: '30 18 * * *'
   workflow_dispatch:
 
 permissions:
@@ -14,7 +14,48 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  check:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      deployments: read
+    outputs:
+      deploy: ${{ steps.compare.outputs.deploy }}
+    steps:
+      - name: Compare with the last successful Pages deployment
+        id: compare
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          if [ "$GITHUB_EVENT_NAME" = "workflow_dispatch" ]; then
+            echo "Manual run: deploying."
+            echo "deploy=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          # GitHub records every Pages deployment, with its commit, under the github-pages environment.
+          # Use the newest one that finished successfully, so earlier failed or skipped runs don't matter.
+          last=""
+          ids=$(gh api "repos/$GH_REPO/deployments?environment=github-pages&per_page=30" --jq '.[].id')
+          for id in $ids; do
+            state=$(gh api "repos/$GH_REPO/deployments/$id/statuses?per_page=1" --jq '.[0].state // empty')
+            if [ "$state" = "success" ]; then
+              last=$(gh api "repos/$GH_REPO/deployments/$id" --jq '.sha')
+              break
+            fi
+          done
+          echo "Last deployed commit: ${last:-none}"
+          echo "Latest commit:        $GITHUB_SHA"
+          if [ "$last" = "$GITHUB_SHA" ]; then
+            echo "No new commits since the last deployment: skipping."
+            echo "deploy=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "deploy=true" >> "$GITHUB_OUTPUT"
+          fi
+
   build:
+    needs: check
+    if: needs.check.outputs.deploy == 'true'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
